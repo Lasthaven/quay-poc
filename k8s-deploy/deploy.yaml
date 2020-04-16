@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  name: hello-world
+  namespace: quay-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-world
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hello-world
+    spec:
+      containers:
+      - image: quay-enterprise.apps.bmwus.fabric-ocpv4-poc.com/testorg/buildtest-gitlab:v1.0.0-dev
+        imagePullPolicy: IfNotPresent
+        name: hello-world
+        ports:
+        - containerPort: 8080
+          protocol: TCP
