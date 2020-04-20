@@ -1,0 +1,61 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: quay-enterprise
+  name: quay-config-app
+  labels:
+    quay-enterprise-component: config-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      quay-enterprise-component: config-app
+  template:
+    metadata:
+      namespace: quay-enterprise
+      labels:
+        quay-enterprise-component: config-app
+    spec:
+      containers:
+      - name: quay-config-app
+        image: quay.io/redhat/quay:v3.2.1
+        ports:
+        - containerPort: 8443
+        command: ["/quay-registry/quay-entrypoint.sh"]
+        args: ["config", "secret"]
+        env:
+        - name: QE_K8S_CONFIG_SECRET
+          value: "quay-config-secret"
+        - name: CONFIG_APP_PASSWORD
+          value: "!Passw0rd1234"
+      imagePullSecrets:
+      - name: redhat-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: quay-enterprise
+  name: quay-config
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    quay-enterprise-component: config-app
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: quay-config
+  namespace: quay-enterprise
+spec:
+  to:
+    kind: Service
+    name: quay-config
+  tls:
+    termination: passthrough
