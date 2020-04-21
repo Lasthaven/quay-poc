@@ -1,8 +1,21 @@
+---
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: quay-postgres-storage
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: managed-premium
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: quay-postgres
-  namespace: quay-enterprise
 spec:
   replicas: 1
   template:
@@ -32,3 +45,16 @@ spec:
       - name: quay-postgredb
         persistentVolumeClaim:
           claimName: quay-postgres-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quay-postgres
+  labels:
+    app: quay-postgres
+spec:
+  type: NodePort
+  ports:
+   - port: 5432
+  selector:
+   app: quay-postgres

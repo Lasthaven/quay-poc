@@ -2,7 +2,6 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  namespace: quay-enterprise
   name: quay-redis
   labels:
     quay-enterprise-component: redis
@@ -13,7 +12,6 @@ spec:
       quay-enterprise-component: redis
   template:
     metadata:
-      namespace: quay-enterprise
       labels:
         quay-enterprise-component: redis
     spec:
@@ -27,7 +25,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: quay-enterprise
   name: quay-redis
   labels:
     quay-enterprise-component: redis
