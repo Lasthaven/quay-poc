@@ -21,12 +21,12 @@ metadata:
   name: quay
   namespace: quay-enterprise
 spec:
-  host: quay.apps.bmwus.fabric-ocpv4-poc.com
   to:
     kind: Service
     name: quay-svc-clusterip
   tls:
     termination: passthrough
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -51,7 +51,7 @@ spec:
           secret:
             secretName: quay-config-secret
       containers:
-      - name: quay
+      - name: quay-enterprise-app
         image: quay.io/redhat/quay:v3.2.1
         ports:
         - containerPort: 8443
@@ -60,6 +60,8 @@ spec:
           readOnly: false
           mountPath: /conf/stack
         env:
+        - name: DEBUGLOG
+          value: "true"
         - name: QE_K8S_CONFIG_SECRET
           value: "quay-config-secret"
       imagePullSecrets:
